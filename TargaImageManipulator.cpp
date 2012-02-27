@@ -128,12 +128,9 @@ void TargaImageManipulator::paint(TargaImage* image,
 	srand(time(nullptr));
 	TargaImage* output = TargaImage::blankImage(image->width(),
 	                     image->height());
-	// Wash the image in white to start with
-	memset(output->pixels(), 255,
-	       kPixelWidth * image->width() * image->height());
 
 	// Minimum radius of 2
-	for (int radius = bRadius; radius >= 2; --radius) {
+	for (int radius = bRadius; radius > 0; --radius) {
 		// Create a blurred copy of the image
 		TargaImage* blurred = TargaImage::blankImage(image->width(),
 		                      image->height());
@@ -168,11 +165,9 @@ void TargaImageManipulator::paintLayer(TargaImage* canvas,
 	// Calculate the differences at each pixel
 	unsigned char* canvasPixel = canvas->pixels();
 	unsigned char* referencePixel = reference->pixels();
-	float differences[canvas->width()][canvas->height()];
+	float differences[canvas->height()][canvas->width()];
 	for (unsigned int y = 0; y < canvas->height(); ++y) {
 		for (unsigned int x = 0; x < canvas->width(); ++x) {
-			canvasPixel += kPixelWidth;
-			referencePixel += kPixelWidth;
 			differences[y][x] = 0;
 			for (size_t c = 0; c < kPixelWidth; ++c) {
 				float diffSq = fabs((float)referencePixel[c] / 255.0f
@@ -181,11 +176,16 @@ void TargaImageManipulator::paintLayer(TargaImage* canvas,
 				differences[y][x] += diffSq;
 			}
 			differences[y][x] = sqrt(differences[y][x]);
+			canvasPixel += kPixelWidth;
+			referencePixel += kPixelWidth;
 		}
 	}
 	// Make the grid size slightly smaller than the radius so that we get some
 	// overlap
 	int gridSize = radius * 2 / 3;
+	// Make sure grid size is at least 1 (it will be zero if radius is 1)
+	if (gridSize < 1)
+		gridSize = 1;
 	for (unsigned int y = 0; y  < canvas->height() + gridSize; y += gridSize) {
 		for (unsigned int x = 0; x < canvas->width() + gridSize;
 		        x += gridSize) {
