@@ -1,0 +1,11 @@
+tags
+paint
+*.o
+*.swp
+*sdf
+*.suo
+*.user
+*.tga
+Debug/
+Release/
+ipch/
