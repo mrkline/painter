@@ -7,13 +7,11 @@
 
 class SeperableKernel;
 
-
+//! Width of a Targa pixel. It is in 32-bit RGBA format.
 const size_t kPixelWidth = 4;
 
-/*!
- * \brief This class allows for image manipulation on Targa images loaded via
- *        the TargaImage class.
- */
+//! This class allows for image manipulation on Targa images loaded via
+//! the TargaImage class.
 class TargaImageManipulator
 {
 public:
@@ -38,9 +36,12 @@ public:
 	//! performed when needed along image boundaries
 	static void convolve(TargaImage* image, const SeperableKernel& k);
 
+	//! Given a brush type and radius, apply a painting algorithm to an image
 	static void paint(TargaImage* image, BrushType brush, int brushRadius);
 
 private:
+	//! Paints a single layer onto canvas using reference to determine desired
+	//! brush colors for this layer.
 	static void paintLayer(TargaImage* canvas, TargaImage* reference,
 	                       BrushType brush, int radius);
 };

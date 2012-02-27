@@ -4,6 +4,8 @@
 
 #include "SeperableKernel.hpp"
 
+//! Provides a Gaussian kernel, where pixels are weighted using a
+//! standard normal distribution curve.
 class GaussianKernel : public SeperableKernel
 {
 public:

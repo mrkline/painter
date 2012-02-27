@@ -22,6 +22,7 @@ static inline float clamp(float x)
 	return std::max(0.0f, std::min(1.0f, x));
 }
 
+//! Returns true if (x, y) is a valid pixel coordinate for the given image
 static inline bool fallsInImage(TargaImage* image,
                                 unsigned int x,
                                 unsigned int y)
@@ -137,6 +138,7 @@ void TargaImageManipulator::paint(TargaImage* image,
 		memcpy(blurred->pixels(), image->pixels(),
 		       kPixelWidth * image->width() * image->height());
 		convolve(blurred, GaussianKernel(radius));
+		// Paint a layer
 		paintLayer(output, blurred, brush, radius);
 		delete blurred;
 	}

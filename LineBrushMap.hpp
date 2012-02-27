@@ -1,4 +1,5 @@
-/* GIMP RGBA C-Source image dump (LineBrushMap.c) */
+//! This file was generated as a .c file by GIMP and then slightly modified
+//! into a header
 
 const struct {
   unsigned int 	 width;

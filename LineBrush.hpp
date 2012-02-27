@@ -2,6 +2,8 @@
 
 #include "Brush.hpp"
 
+//! Loads a 31x31 cirle brush from LineBrushMap.hpp and scales it to the
+//! desired width
 class LineBrush : public Brush
 {
 public:
