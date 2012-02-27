@@ -49,7 +49,6 @@ static bool hasEnding (const string& fullString, const string& ending,
 
 int main(int argc, char** argv)
 {
-	printf("\n");
 	// Validate number of arguments
 	if (argc < 3 || argc > 5) {
 		printf(

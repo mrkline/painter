@@ -142,9 +142,6 @@ void TargaImageManipulator::paint(TargaImage* image,
 		convolve(blurred, GaussianKernel(radius));
 		paintLayer(output, blurred, brush, radius);
 		delete blurred;
-		// For now just iterate once to see what things look like
-		output->write("pass1.tga");
-		break;
 	}
 
 	// Copy back to the source Targa
@@ -233,12 +230,51 @@ void TargaImageManipulator::paintLayer(TargaImage* canvas,
 	std::sort(strokes.begin(), strokes.end());
 
 	printf("\t\tDrawing %lu strokes.\n", strokes.size());
-	// Draw strokes. For now just draw dots.
-	for (auto it = strokes.begin(); it != strokes.end(); ++it) {
-		unsigned char* pixel = getPixel(canvas, it->x, it->y);
-		pixel[0] = 0;
-		pixel[1] = 0;
-		pixel[2] = 0;
-		pixel[3] = 255;
+
+	Brush* b;
+	if (brush == BR_LINE) {
+		b = new LineBrush(radius);
 	}
+	else {
+		b = new CircleBrush(radius);
+	}
+	// Draw strokes.
+	for (auto it = strokes.begin(); it != strokes.end(); ++it) {
+		int strokeLeft = it->x - b->getRadius();
+		int strokeRight = it->x + b->getRadius();
+		int strokeTop = it->y - b->getRadius();
+		int strokeBottom = it->y + b->getRadius();
+		unsigned char* referencePixel = getPixel(reference, it->x, it->y);
+		float rr = (float)referencePixel[0] / 255.0f;
+		float rg = (float)referencePixel[1] / 255.0f;
+		float rb = (float)referencePixel[2] / 255.0f;
+		// Normalize reference pixel values
+		for (int y = strokeTop; y <= strokeBottom; ++y) {
+			for (int x = strokeLeft; x <= strokeRight; ++x) {
+				if (fallsInImage(canvas, x, y)) {
+					// Ignore the reference pixel's alpha and use that of the
+					// brush
+					float ra = (float)b->getValue(x - it->x, y - it->y)
+					           / 255.0f;
+					unsigned char* canvasPixel = getPixel(canvas, x, y);
+					// Normalize canvas values
+					float cr = (float)canvasPixel[0] / 255.0f;
+					float cg = (float)canvasPixel[1] / 255.0f;
+					float cb = (float)canvasPixel[2] / 255.0f;
+					float ca = (float)canvasPixel[3] / 255.0f;
+					// Alpha blend the brush stroke
+					float ba = ra + ca * (1.0f - ra);
+					float br = (rr * ra + cr * ca * (1.0f - ra)) / ba;
+					float bg = (rg * ra + cg * ca * (1.0f - ra)) / ba;
+					float bb = (rb * ra + cb * ca * (1.0f - ra)) / ba;
+					// Write the pixel out
+					canvasPixel[0] = (unsigned char)(br * 255.0f);
+					canvasPixel[1] = (unsigned char)(bg * 255.0f);
+					canvasPixel[2] = (unsigned char)(bb * 255.0f);
+					canvasPixel[3] = (unsigned char)(ba * 255.0f);
+				}
+			}
+		}
+	}
+	delete b;
 }
