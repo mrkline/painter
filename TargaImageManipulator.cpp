@@ -14,7 +14,7 @@
 #include "LineBrush.hpp"
 
 // An area must exceed this normalized error per pixel to get a stroke
-static const float kErrorForStroke = 0.1;
+static const float kErrorForStroke = 0.1f;
 
 //! clamps a value to the [0..1] range
 static inline float clamp(float x)
@@ -126,7 +126,7 @@ void TargaImageManipulator::paint(TargaImage* image,
                                   int bRadius)
 {
 	// Seed the random number generator used in paintLayer
-	srand(time(nullptr));
+	srand((int)time(nullptr));
 	TargaImage* output = TargaImage::blankImage(image->width(),
 	                     image->height());
 
@@ -167,8 +167,10 @@ void TargaImageManipulator::paintLayer(TargaImage* canvas,
 	// Calculate the differences at each pixel
 	unsigned char* canvasPixel = canvas->pixels();
 	unsigned char* referencePixel = reference->pixels();
-	float differences[canvas->height()][canvas->width()];
+	std::vector<std::vector<float>> differences;
+	differences.resize(canvas->height());
 	for (unsigned int y = 0; y < canvas->height(); ++y) {
+		differences[y].resize(canvas->width());
 		for (unsigned int x = 0; x < canvas->width(); ++x) {
 			differences[y][x] = 0;
 			for (size_t c = 0; c < kPixelWidth; ++c) {
