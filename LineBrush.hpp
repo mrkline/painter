@@ -8,10 +8,15 @@ public:
 	LineBrush(int radius);
 	~LineBrush();
 
+	//! inlined for speed
 	unsigned char getValue(int x, int y) const
-	{ return weights[((r + y) * width) + r + x]; }
+	{
+		int index = ((r + y) * width) + (r + x);
+		assert(index >= 0 && index < width * width);
+		return weights[index];
+	}
 
 private:
 	unsigned char* weights;
-	unsigned int width;
+	int width;
 };

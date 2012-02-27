@@ -27,8 +27,8 @@ LineBrush::LineBrush(int radius)
 	delete xScaledMap;
 	// We only care about the alpha component
 	unsigned char* scaledMapPixel = scaledMap->pixels();
-	for (unsigned int y = 0; y < width; ++y)
-		for (unsigned int x = 0; x < width; ++x, scaledMapPixel += kPixelWidth)
+	for (int y = 0; y < width; ++y)
+		for (int x = 0; x < width; ++x, scaledMapPixel += kPixelWidth)
 			weights[y * width + x] = scaledMapPixel[3];
 
 	delete scaledMap;
