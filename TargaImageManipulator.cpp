@@ -2,17 +2,31 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdlib> // for srand and rand
+#include <ctime> // for seeding srand
 #include <memory> // for auto_ptr
+#include <vector>
 
 #include "TargaImage.h"
 #include "SeperableKernel.hpp"
+#include "GaussianKernel.hpp"
 #include "CircleBrush.hpp"
 #include "LineBrush.hpp"
+
+// An area must exceed this normalized error per pixel to get a stroke
+static const float kErrorForStroke = 0.1;
 
 //! clamps a value to the [0..1] range
 static inline float clamp(float x)
 {
 	return std::max(0.0f, std::min(1.0f, x));
+}
+
+static inline bool fallsInImage(TargaImage* image,
+                                unsigned int x,
+                                unsigned int y)
+{
+	return x >= 0 && x < image->width() && y >= 0 && y < image->height();
 }
 
 void TargaImageManipulator::convolve(TargaImage* image,
@@ -107,8 +121,124 @@ void TargaImageManipulator::convolve(TargaImage* image,
 
 
 void TargaImageManipulator::paint(TargaImage* image,
-                                  TargaImageManipulator::BrushType brush,
+                                  BrushType brush,
                                   int bRadius)
 {
-	LineBrush(2);
+	// Seed the random number generator used in paintLayer
+	srand(time(nullptr));
+	TargaImage* output = TargaImage::blankImage(image->width(),
+	                     image->height());
+	// Wash the image in white to start with
+	memset(output->pixels(), 255,
+	       kPixelWidth * image->width() * image->height());
+
+	// Minimum radius of 2
+	for (int radius = bRadius; radius >= 2; --radius) {
+		// Create a blurred copy of the image
+		TargaImage* blurred = TargaImage::blankImage(image->width(),
+		                      image->height());
+		memcpy(blurred->pixels(), image->pixels(),
+		       kPixelWidth * image->width() * image->height());
+		convolve(blurred, GaussianKernel(radius));
+		paintLayer(output, blurred, brush, radius);
+		delete blurred;
+		// For now just iterate once to see what things look like
+		output->write("pass1.tga");
+		break;
+	}
+
+	// Copy back to the source Targa
+	memcpy(image->pixels(), output->pixels(),
+	       kPixelWidth * image->width() * image->height());
+	delete output;
+}
+
+
+void TargaImageManipulator::paintLayer(TargaImage* canvas,
+                                       TargaImage* reference,
+                                       BrushType brush,
+                                       int radius)
+{
+	printf("\t Generating strokes using a brush with a radius of %d...\n",
+	       radius);
+	// A stroke location, sortable by z-order
+	struct StrokeLocation {
+		int x, y, z;
+		StrokeLocation(int X, int Y, int Z) : x(X), y(Y), z(Z) { }
+		bool operator<(const StrokeLocation& o) const { return z < o.z; }
+	};
+	std::vector<StrokeLocation> strokes;
+	// Calculate the differences at each pixel
+	unsigned char* canvasPixel = canvas->pixels();
+	unsigned char* referencePixel = reference->pixels();
+	float differences[canvas->width()][canvas->height()];
+	for (unsigned int y = 0; y < canvas->height(); ++y) {
+		for (unsigned int x = 0; x < canvas->width(); ++x) {
+			canvasPixel += kPixelWidth;
+			referencePixel += kPixelWidth;
+			differences[y][x] = 0;
+			for (size_t c = 0; c < kPixelWidth; ++c) {
+				float diffSq = fabs((float)referencePixel[c] / 255.0f
+				                    - (float)canvasPixel[c] / 255.0f);
+				diffSq *= diffSq;
+				differences[y][x] += diffSq;
+			}
+			differences[y][x] = sqrt(differences[y][x]);
+		}
+	}
+	// Make the grid size slightly smaller than the radius so that we get some
+	// overlap
+	int gridSize = radius * 2 / 3;
+	for (unsigned int y = 0; y  < canvas->height() + gridSize; y += gridSize) {
+		for (unsigned int x = 0; x < canvas->width() + gridSize;
+		        x += gridSize) {
+			// Sum the error in the region around the grid point, and find the
+			// pixel with the highest error
+			int halfGrid = gridSize / 2;
+			int gridLeft = x - halfGrid;
+			int gridRight = x + halfGrid;
+			int gridTop = y - halfGrid;
+			int gridBottom = y + halfGrid;
+			float highestError = -1.0f;
+			int highestErrorX;
+			int highestErrorY;
+			// Total error of the area
+			float areaError = 0.0f;
+			// Tracks the number of pixels in the grid
+			// that fall within the image
+			float pixelsSummed = 0.0f;
+			for (int gy = gridTop; gy <= gridBottom; ++gy) {
+				for (int gx = gridLeft; gx <= gridRight; ++gx) {
+					if (fallsInImage(canvas, gx, gy)) {
+						pixelsSummed += 1.0f;
+						areaError += differences[gy][gx];
+						if (differences[gy][gx] > highestError) {
+							highestError = differences[gy][gx];
+							highestErrorY = gy;
+							highestErrorX = gx;
+						}
+					}
+				}
+			}
+			// If our area exceeded the threshold of error per pixel, it gets
+			// a stroke at its highest error point
+			if (areaError / pixelsSummed >= kErrorForStroke) {
+				strokes.push_back(StrokeLocation(highestErrorX,
+				                                 highestErrorY,
+				                                 rand()));
+			}
+		}
+	}
+	// Sort the strokes by randomized z-order
+	std::sort(strokes.begin(), strokes.end());
+
+	printf("\t\tDrawing %lu strokes.\n", strokes.size());
+	// Draw strokes. For now just draw dots.
+	for (auto it = strokes.begin(); it != strokes.end(); ++it) {
+		unsigned char* pixel = getPixel(canvas, it->x, it->y);
+		pixel[0] = 0;
+		pixel[1] = 0;
+		pixel[2] = 0;
+		pixel[3] = 255;
+	}
 }

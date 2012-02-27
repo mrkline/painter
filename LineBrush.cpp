@@ -11,7 +11,7 @@ LineBrush::LineBrush(int radius)
 	: Brush(radius), width(radius * 2 + 1)
 {
 	unsigned int area = width * width;
-	weights = (float*)malloc(area * sizeof(float));
+	weights = (unsigned char*)malloc(area);
 	// Load up our map into a Targa so we can scale it using the scaling code
 	// we've already written.
 	TargaImage* map = TargaImage::blankImage(LineBrushMap.width,
@@ -26,7 +26,6 @@ LineBrush::LineBrush(int radius)
 	delete map;
 	delete xScaledMap;
 	// We only care about the alpha component
-	scaledMap->write("line.tga");
 	unsigned char* scaledMapPixel = scaledMap->pixels();
 	for (unsigned int y = 0; y < width; ++y)
 		for (unsigned int x = 0; x < width; ++x, scaledMapPixel += kPixelWidth)

@@ -65,9 +65,8 @@ int main(int argc, char** argv)
 	int radius;
 	if (argc == 5) {
 		if (sscanf(argv[4], "%d", &radius) != 1
-		        || radius < 1 || radius > 15) {
-			fprintf(stderr, "Error: brush radius must be a positive integer"
-			        " no greater than 15.\n");
+		        || radius < 2 || radius > 15) {
+			fprintf(stderr, "Error: brush radius must be between 2 and 15.\n");
 			return 1;
 		}
 	}

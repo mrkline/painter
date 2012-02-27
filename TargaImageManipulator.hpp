@@ -39,4 +39,8 @@ public:
 	static void convolve(TargaImage* image, const SeperableKernel& k);
 
 	static void paint(TargaImage* image, BrushType brush, int brushRadius);
+
+private:
+	static void paintLayer(TargaImage* canvas, TargaImage* reference,
+	                       BrushType brush, int radius);
 };

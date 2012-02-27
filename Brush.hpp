@@ -10,7 +10,7 @@ public:
 	{ assert(r <= 30); }
 	int getRadius() const { return r; }
 
-	virtual float getValue(int x, int y) const = 0;
+	virtual unsigned char getValue(int x, int y) const = 0;
 
 protected:
 	const int r;

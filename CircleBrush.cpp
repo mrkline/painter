@@ -11,7 +11,7 @@ CircleBrush::CircleBrush(int radius)
 	: Brush(radius), width(radius * 2 + 1)
 {
 	unsigned int area = width * width;
-	weights = (float*)malloc(area * sizeof(float));
+	weights = (unsigned char*)malloc(area);
 	// Load up our map into a Targa so we can scale it using the scaling code
 	// we've already written.
 	TargaImage* map = TargaImage::blankImage(CircleBrushMap.width,
