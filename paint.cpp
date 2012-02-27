@@ -8,9 +8,9 @@
 using namespace std;
 
 static const char brushes[] = "Available brushes are:\n"
-                                  "\tc (circle)\n"
-                                  "\tl (angled line)\n"
-                                  "An angled line is the default.\n\n";
+                              "\tc (circle)\n"
+                              "\tl (angled line)\n"
+                              "An angled line is the default.\n\n";
 
 
 /*!
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	if (argc < 3 || argc > 5) {
 		printf(
 		    "Usage: paint [input TGA] [output TGA] [brush]"
-			" [starting brush radius]"
+		    " [starting brush radius]"
 		    "\n\tThe brush radius is in pixels."
 		    "\n\tSpecifying the brush and radius is optional.\n%s",
 		    brushes);
@@ -65,9 +65,9 @@ int main(int argc, char** argv)
 	int radius;
 	if (argc == 5) {
 		if (sscanf(argv[4], "%d", &radius) != 1
-				|| radius < 1 || radius > 15) {
+		        || radius < 1 || radius > 15) {
 			fprintf(stderr, "Error: brush radius must be a positive integer"
-					" no greater than 15.\n");
+			        " no greater than 15.\n");
 			return 1;
 		}
 	}
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 		       "\n\tAn attempt to read it will be made anyways.\n");
 	}
 
-	TargaImage* ti= TargaImage::readImage(argv[1]);
+	TargaImage* ti = TargaImage::readImage(argv[1]);
 	if (ti == nullptr) {
 		fprintf(stderr, "The input file could not be read.\n");
 		return 1;

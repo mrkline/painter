@@ -10,7 +10,7 @@ public:
 	 * \param radiusY the Y-axis radius of the kernel (height is radiusY*2 + 1)
 	 */
 	SeperableKernel(int radiusX, int radiusY)
-			: rx(radiusX), ry(radiusY) { }
+		: rx(radiusX), ry(radiusY) { }
 
 	int getRowRadius() const { return rx; }
 

@@ -17,17 +17,15 @@ const size_t kPixelWidth = 4;
 class TargaImageManipulator
 {
 public:
-	enum BrushType
-	{
-		BR_CIRCLE,
-		BR_LINE
+	enum BrushType {
+	    BR_CIRCLE,
+	    BR_LINE
 	};
 
 	//! Inlined since it will be used frequently
 	static unsigned char* getPixel(TargaImage* image,
-										  unsigned int x,
-										  unsigned int y)
-	{
+	                               unsigned int x,
+	                               unsigned int y) {
 		assert(x >= 0);
 		assert(x < image->width());
 		assert(y >= 0);

@@ -1,8 +1,8 @@
 #pragma once
 
 enum Dimension {
-	DIM_WIDTH,
-	DIM_HEIGHT
+    DIM_WIDTH,
+    DIM_HEIGHT
 };
 
 class TargaImage;

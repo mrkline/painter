@@ -15,11 +15,11 @@ CircleBrush::CircleBrush(int radius)
 	// Load up our map into a Targa so we can scale it using the scaling code
 	// we've already written.
 	TargaImage* map = TargaImage::blankImage(CircleBrushMap.width,
-			CircleBrushMap.height);
+	                  CircleBrushMap.height);
 	memcpy(map->pixels(),
-			CircleBrushMap.pixel_data,
-			CircleBrushMap.width * CircleBrushMap.height
-			* CircleBrushMap.bytes_per_pixel);
+	       CircleBrushMap.pixel_data,
+	       CircleBrushMap.width * CircleBrushMap.height
+	       * CircleBrushMap.bytes_per_pixel);
 	// Scale the map
 	TargaImage* xScaledMap = areaResize(map, width, DIM_WIDTH);
 	TargaImage* scaledMap = areaResize(xScaledMap, width, DIM_HEIGHT);

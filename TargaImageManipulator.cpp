@@ -107,8 +107,8 @@ void TargaImageManipulator::convolve(TargaImage* image,
 
 
 void TargaImageManipulator::paint(TargaImage* image,
-		TargaImageManipulator::BrushType brush,
-		int bRadius)
+                                  TargaImageManipulator::BrushType brush,
+                                  int bRadius)
 {
 	LineBrush(2);
 }

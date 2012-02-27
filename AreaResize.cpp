@@ -73,13 +73,13 @@ TargaImage* areaResize(TargaImage* original,
 				unsigned char* pixel;
 				if (dim == DIM_WIDTH) {
 					pixel = TargaImageManipulator::getPixel(original,
-							pixelNum,
-							y);
+					                                        pixelNum,
+					                                        y);
 				}
 				else {
 					pixel = TargaImageManipulator::getPixel(original,
-							x,
-							pixelNum);
+					                                        x,
+					                                        pixelNum);
 				}
 				float areaWidth = areaInPixel(regionStart, regionEnd, pixelNum);
 				for (size_t c = 0; c < kPixelWidth; ++c)

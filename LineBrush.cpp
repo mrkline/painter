@@ -15,11 +15,11 @@ LineBrush::LineBrush(int radius)
 	// Load up our map into a Targa so we can scale it using the scaling code
 	// we've already written.
 	TargaImage* map = TargaImage::blankImage(LineBrushMap.width,
-			LineBrushMap.height);
+	                  LineBrushMap.height);
 	memcpy(map->pixels(),
-			LineBrushMap.pixel_data,
-			LineBrushMap.width * LineBrushMap.height
-			* LineBrushMap.bytes_per_pixel);
+	       LineBrushMap.pixel_data,
+	       LineBrushMap.width * LineBrushMap.height
+	       * LineBrushMap.bytes_per_pixel);
 	// Scale the map
 	TargaImage* xScaledMap = areaResize(map, width, DIM_WIDTH);
 	TargaImage* scaledMap = areaResize(xScaledMap, width, DIM_HEIGHT);

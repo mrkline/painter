@@ -17,7 +17,7 @@ static inline float sndIntegral(float a, float b)
 }
 
 GaussianKernel::GaussianKernel(int radius)
-		: SeperableKernel(radius, radius)
+	: SeperableKernel(radius, radius)
 {
 	int width = radius * 2 + 1;
 
